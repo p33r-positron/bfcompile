@@ -1,5 +1,5 @@
 # bfcompile
-Compilateur BrainFuck vers Exécutable via traduction en C.  
+Transpilateur/Compilateur BrainFuck vers Exécutable via traduction en C.  
 
 # Installation
 
@@ -22,3 +22,4 @@ Il faut soit GCC soit CLANG soit TCC, et dans le PATH.
 # Trucs à Fixer
 
 Rendre possible la suppression automatique du fichier "temporaire" avec un argument CLI.  
+Utiliser switch à la place de if-else  
