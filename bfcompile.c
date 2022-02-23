@@ -5,7 +5,10 @@
 int main(int argc, char** argv)
 {
 	if(argc != 3) //Si il n'y a pas spécifiquement 3 arguments...
-		return fprintf(stderr, "Utilisation: bfcompile <file.bf> <binaryName>\r\n")-47; //48 caractères - 47 = 1, code d'erreur 1 :)
+	{
+		fputs("Utilisation: bfcompile <file.bf> <binaryName>\r\n", stderr); //...Erreur !
+		return 1; //Le programme retournera un code d'erreur
+	}
 
 	FILE *in = 0, *out = 0; //Création de pointeurs vides pour les fichiers
 
@@ -15,16 +18,16 @@ int main(int argc, char** argv)
 		system("chcp 65001 > nul"); //Windows et les accents... Change de "page de code" pour les accents (chcp) mais discrètement (> nul)
 	#endif
 
-	if(in == 0) //Si in pointe toujours vers 0/NULL...
-		return fprintf(stderr, "Erreur pendant l'ouverture du fichier d'entrée :(\r\n")-50; //...Erreur ! 51 caractères - 50 = 1, code d'erreur 1 :)
-	if(out == 0) //Si out pointe toujours vers 0/NULL...
-		return fprintf(stderr, "Erreur pendant la suppression du fichier de sortie :(\r\n")-54; //...Erreur ! 55 caractères - 54 = 1, code d'erreur 1 :)
-
-	out = 0; //Ré-assignation du pointeur "out" vers 0/NULL
-	out = fopen("tmpfile.c", "a"); //Assignation du pointeur "out" vers le fichier de sortie temporaire en mode "ajout"
-
-	if(out == 0) //Si out pointe toujours vers 0/NULL...
-		return fprintf(stderr, "Erreur pendant l'ouverture du fichier de sortie :(\r\n")-51; //...Erreur ! 52 caractères - 51 = 1, code d'erreur 1 :)
+	if(!in) //Si in est faux (donc vaut 0, donc pointe toujours vers 0/NULL)...
+	{
+		fputs("Erreur pendant l'ouverture du fichier d'entrée :(\r\n", stderr); //...Erreur !
+		return 1; //Le programme retournera un code d'erreur
+	}
+	if(!out) //Si out est faux (donc vaut 0, donc pointe toujours vers 0/NULL)...
+	{
+		fputs("Erreur pendant la suppression du fichier de sortie :(\r\n", stderr); //...Erreur !
+		return 1; //Le programme retournera un code d'erreur
+	}
 
 	//Écriture de la base nécéssaire dans le fichier temporaire, un char prends un octet, donc c'est bien 135 car on veut pas du null terminator caché.
 	fwrite("#include <stdio.h>\n\n//Auto-Généré par bfcompile\n\nint main(void)\n{\n\tunsigned char memory[30000] = {0};\n\tunsigned char* ptr = memory;\n", sizeof(char), (size_t)135, out);
@@ -66,22 +69,22 @@ int main(int argc, char** argv)
 
 	printf("Essai de compilation avec GCC...\r\n");
 	sprintf(compilation, "gcc   tmpfile.c -o %s", argv[2]); //On met la commande de compilation version GCC dans compilation
-	if(system(compilation) == 0) //Si la commande renvoie 0 (Code d'erreur signifiant l'absence d'erreurs)...
-		printf("Réussi !\r\n"); //...fin !
+	if(!system(compilation)) //Si la commande est fausse (donc renvoie 0 (Code d'erreur signifiant l'absence d'erreurs))...
+		puts("Réussi !"); //...fin !
 	else //Sinon:
 	{
-		printf("Raté...\r\nEssai de compilation avec CLANG...\r\n");
+		puts("Raté...\r\nEssai de compilation avec CLANG...");
 		sprintf(compilation, "clang tmpfile.c -o %s", argv[2]); //On met la commande de compilation version CLANG dans compilation
-		if(system(compilation) == 0) //Si la commande renvoie 0 (Code d'erreur signifiant l'absence d'erreurs)...
-			printf("Réussi !\r\n"); //...fin !
+		if(!system(compilation)) //Si la commande renvoie 0 (Code d'erreur signifiant l'absence d'erreurs)...
+			puts("Réussi !"); //...fin !
 		else //Sinon:
 		{
-			printf("Raté...\r\nEssai de compilation avec TCC...\r\n");
+			puts("Raté...\r\nEssai de compilation avec TCC...");
 			sprintf(compilation, "tcc   tmpfile.c -o %s", argv[2]); //On met la commande de compilation version TCC dans compilation
-			if(system(compilation) == 0) //Si la commande renvoie 0 (Code d'erreur signifiant l'absence d'erreurs)...
-				printf("Réussi !\r\n"); //...fin !
+			if(!system(compilation)) //Si la commande renvoie 0 (Code d'erreur signifiant l'absence d'erreurs)...
+				puts("Réussi !"); //...fin !
 			else //Sinon, message d'erreur final !
-				return fprintf(stderr, "Désolé, aucune compilation n'a réussi, la cause probable est que le développeur est un idiot ou que vous ne possèdez ni GCC, ni TCC, ni CLANG.\r\n")-143;
+				fputs("Désolé, aucune compilation n'a réussi, la cause probable est que le développeur est un idiot ou que vous ne possèdez ni GCC, ni TCC, ni CLANG.\r\n", stderr);
 		}
 	}
 
