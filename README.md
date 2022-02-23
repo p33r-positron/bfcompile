@@ -17,7 +17,7 @@ BrainFuck -> bfcompile -> C -> GCC/CLANG/TCC -> Exécutable/Binaire
 
 # Dépendences
 
-Il faut soit GCC soit CLANG soit TCC, et dans le PATH.  
+Il faut avoir GCC ou CLANG ou TCC installé, et dans le PATH.  
 
 # Trucs à Fixer
 
